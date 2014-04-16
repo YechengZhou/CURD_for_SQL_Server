@@ -85,5 +85,5 @@ class User(Model):
     
 if __name__ == "__main__":
     
-    u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd')
+    u = User(id=1, name='Yecheng', email='yecheng@123.com', password='password')
     u.save()        
