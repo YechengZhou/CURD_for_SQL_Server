@@ -8,9 +8,21 @@ Basic method of sql server db operation, including connect to DB and execute som
 
 """
 
-import pymssql
+import pymssql ## official ms sql server lib
 import pyMSSQL
+import functools
+import types
 
+def sql_error_log_handler(text):
+    def decorator(func):
+        @functools.wraps(func)
+        def print_sql(*args,**kw):
+            print "Error occur when executing %s action" % text
+            return func(*args,**kw)
+        return print_sql
+    return decorator
+
+    
 class myMSSQL:
     
     def __init__(self,host,user,pwd,db):
@@ -18,6 +30,7 @@ class myMSSQL:
         self.user = user
         self.pwd = pwd
         self.db = db
+        
     def _GetConnect(self):
         """
         connect to db
@@ -32,6 +45,8 @@ class myMSSQL:
             raise(NameError,"Connet to DB "+self.db+" failed")
         else: 
             return cur
+     
+        
     def ExecQuery(self,sql):
         """
         execute query 
@@ -45,47 +60,44 @@ class myMSSQL:
         self.conn.close()
         return resList
     
+    
     def ExecNoQuery(self,sql):
         """
         execute none-query 
         return affect rows
         """ 
         cur = self._GetConnect()
-        if "insert" in sql:
-            try:
-                cur.execute(sql)
-                self.conn.commit() #important
-            except:
-                self.conn.close()
-                return "insert error" 
+        try:
+            cur.execute(sql)
+            self.conn.commit() #important
+        except:
+            self.conn.close()
+            raise "%s error" % sql.strip().split(" ")[0]
+        
         self.conn.close()
-        return cur.rowcount
+        return True
     
     def sync(self,table_class):
-        # check if table exists
-        # TODO
+
         column_str = []
         create_table_sql = 'create table %s ' % str(table_class.__name__)
         if issubclass(table_class,pyMSSQL.myModule):
             #print table_class
             mapping_attr =  vars(table_class)['__mapping__']  # get all columns
+            
             for attr_name in mapping_attr.keys():
                 if isinstance(mapping_attr[attr_name],pyMSSQL.Field):
                     #print "yes"
                     #print mapping_attr[attr_name].column_type
-                    column_str.append(attr_name + ' ' + mapping_attr[attr_name].column_type)
+                    column_str.append(mapping_attr[attr_name].name + ' ' + mapping_attr[attr_name].column_type)
             create_table_sql += "(%s)" % ",".join(column_str)
-        print create_table_sql
-    def check_filed_type(self,this_class,field_type): 
-        pass
-              
-"""
-create table db1  
-(  
-id int not null ,   
-pwd varchar(50) not null,   
-asd varchar(50) not null, 
-123 int
-) 
-"""
+        print "Creating table using sql --%s--" % create_table_sql
+        
+        try:
+            self.ExecNoQuery(create_table_sql)
+        except:
+            if isinstance( self.ExecQuery("select * from %s" % str(table_class.__name__)) , types.ListType ):
+                print "Info: Table %s may already exists" % str(table_class.__name__)
+            else:
+                print "Info: Other unknown error" 
         

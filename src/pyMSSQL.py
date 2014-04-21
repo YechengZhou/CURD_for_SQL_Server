@@ -23,7 +23,7 @@ u.save()
 """
 
 
-#import mssqldb
+
 import types
 
 class Field(object):
@@ -47,15 +47,17 @@ class myModuleMetaclass(type):
         if name == "myModule":
             return type.__new__(cls,name,bases,attrs)
         mapping = dict()
+        #import mssqldb
         for k,v in attrs.iteritems():
             if isinstance(v,Field):
                 print('Found mapping: %s==>%s' % (k,v))
                 mapping[k] = v
-            """
-            if isinstance(v,mssqldb.myMSSQL):
+            """elif isinstance(v,mssqldb.myMSSQL):
                 attrs["__database__"] = v
-                print('Connect to DB and get myMSSQL to do DB operations')
-            """    
+                print 'Connect to DB and get myMSSQL to do DB operations'
+            else:
+                print "#"
+                print k,v """
         for k in mapping.iterkeys():
             attrs.pop(k)
         attrs["__table__"] = name
@@ -77,7 +79,7 @@ class myModule(dict):
     def __setarr__(self,key,value):
         self[key] = value
     
-    def save(self):
+    def save(self, db):
         fields = []
         values = []
         
@@ -100,23 +102,12 @@ class myModule(dict):
             elif type(getattr(self,k)) is types.BooleanType:
                 values_str.append(getattr(self,k))
                 fields_str.append(v.name)
-        self.sql = 'insert into %s (%s) values (%s)' % (self.__table__, ','.join(fields_str) + ',' + ','.join(fields_num), ','.join([('"%s"' % str(i)) for i in values_str]) + ',' + ','.join([str(j) for j in values_num]))
+        
+        self.sql = 'insert into %s (%s) values (%s)' % (self.__table__, ','.join(fields_str) + ',' + ','.join(fields_num), ','.join([("'%s'" % str(i)) for i in values_str]) + ',' + ','.join([str(j) for j in values_num]))
+        
         print self.sql
         
-
-
-"""
-
-class User(myModule):
-    id = IntegerField('id')
-    name = StringField('username')
-    email = StringField('email')
-    password = StringField('password')
-    
-if __name__ == "__main__":
-    
-    db = mssqldb.myMSSQL("localhost",'sa','symantec','test')
-    db.sync(User)
-    u = User(db=db, id=1, name='Yecheng', email='yecheng@123.com', password='password') ## new a record in User table
-    u.save()        
-"""
+        db.ExecNoQuery(self.sql)
+        
+        
+        

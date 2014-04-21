@@ -3,12 +3,12 @@ from pyMSSQL import *
 
 class Users(myModule):
     id = IntegerField('id')
-    name = StringField('username')
+    name = StringField('name')
     email = StringField('email')
     password = StringField('password')
     
 
-db = mssqldb.myMSSQL("localhost",'sa','symantec','test')
+db = mssqldb.myMSSQL("localhost",'sa','symantec','test')  ## server ip, user, pwd, DB
 
 
 """
@@ -43,7 +43,8 @@ for i in all_attr:
 """
 
 db.sync(Users)
-"""
-u = User(db=db, id=1, name='Yecheng', email='yecheng@123.com', password='password') ## new a record in User table
-u.save()
-""" 
+
+#u = Users( id=1, name='Yecheng', email='yecheng@123.com', password='password') ## new a record in User table
+
+#u.save(db) # save the change to db
+
