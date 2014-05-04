@@ -2,11 +2,10 @@ import mssqldb
 from pyMSSQL import *
 
 class Users(myModule):
-    id = IntegerField('id')
-    name = StringField('name')
-    email = StringField('email')
-    password = StringField('password')
-    
+    id = IntegerField('id',default='NULL')
+    name = StringField('name',default='NULL')
+    email = StringField('email',default='NULL')
+    password = StringField('password',default='NULL')
 
 db = mssqldb.myMSSQL("localhost",'sa','symantec','test')  ## server ip, user, pwd, DB
 
@@ -47,4 +46,11 @@ db.sync(Users)
 #u = Users( id=1, name='Yecheng', email='yecheng@123.com', password='password') ## new a record in User table
 
 #u.save(db) # save the change to db
+u = Users()
+
+u.id = 1
+u.name = "Ethan"
+
+
+u.save(db)
 
