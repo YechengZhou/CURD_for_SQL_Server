@@ -47,10 +47,16 @@ db.sync(Users)
 
 #u.save(db) # save the change to db
 u = Users()
+print "x"*100
 
+Users.delete(db,name='Ethan')
+
+print "x"*100
+"""
 u.id = 1
 u.name = "Ethan"
 
 
 u.save(db)
 
+User.delete(name='Etahn')"""
