@@ -1,14 +1,15 @@
-CRUD_for_SQL_Server
-
+CRUD for SQL Server
+=================================== 
 
 Simple ORM for SQL Server
+
 Help to make SQL Server easy to use, avoid executing sql command to do CRUD in SQL Server
 
-=====
 
 Sample Code:
+-----------------------------------  
 
-Create tabble:
+###Create table:
 ```python
 >>> import mssqldb
 >>> from pyMSSQL import *
@@ -23,14 +24,14 @@ Create tabble:
 >>>db.sync(Users)  # create table, just like django..
 ```
 
-Insert:
+###Insert:
 ```python
 >>>u = Users( id=1, name='Yecheng', email='yecheng@123.com', password='password') ## new a record in User table
 
 >>>u.save(db) # save the change to db
 ```
 
-Delete:
+###Delete:
 ```python
 >>>Users.delete(db,name='Ethan') # == delete from User where name = 'Ethan'
 ```
