@@ -1,9 +1,9 @@
-CRUD for SQL Server
+CURD for SQL Server
 =================================== 
 
 Simple ORM for SQL Server
 
-Help to make SQL Server easy to use, avoid executing sql command to do CRUD in SQL Server
+Help to make SQL Server easy to use, avoid executing sql command to do CURD in SQL Server
 
 
 Sample Code:
