@@ -37,8 +37,15 @@ Sample Code:
 >>>Users.delete(db,name='Ethan') # == delete from Users where name = 'Ethan'
 ```
 
-
 ###Update:
 ```python
 >>>Users.update(db, name='Ethan').where(name='ethan') # == Update Users SET email = 'Ethan' WHERE name = 'ethan' 
 ```
+
+###Select:
+```python
+>>>result = Users.select(db,'*').where(None) # == Select * from Users
+>>>result = Users.select(db,'email','name').where(None) # == Select email, name from Users
+>>>result = Users.select(db,'email','name').where(name='ethan') # == Select email, name from User Where name = 'ethan'
+```
+
