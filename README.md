@@ -1,10 +1,11 @@
 CURD for SQL Server
 =================================== 
 
-Simple ORM for SQL Server
+Simple(maybe stupid...) ORM for SQL Server.
 
-Help to make SQL Server easy to use, avoid executing sql command to do CURD in SQL Server
+Help to make SQL Server easy to use, avoid executing sql command to do CURD in SQL Server.
 
+It hasn't support complex operation, it just a practice for python...
 
 Sample Code:
 -----------------------------------  
@@ -33,5 +34,11 @@ Sample Code:
 
 ###Delete:
 ```python
->>>Users.delete(db,name='Ethan') # == delete from User where name = 'Ethan'
+>>>Users.delete(db,name='Ethan') # == delete from Users where name = 'Ethan'
+```
+
+
+###Update:
+```python
+>>>Users.update(db, name='Ethan').where(name='ethan') # == Update Users SET email = 'Ethan' WHERE name = 'ethan' 
 ```
