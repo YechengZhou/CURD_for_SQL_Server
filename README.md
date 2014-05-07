@@ -1,10 +1,11 @@
 CURD for SQL Server
 =================================== 
 
-Simple ORM for SQL Server
+Simple(maybe stupid...) ORM for SQL Server.
 
-Help to make SQL Server easy to use, avoid executing sql command to do CURD in SQL Server
+Help to make SQL Server easy to use, avoid executing sql command to do CURD in SQL Server.
 
+It hasn't support complex operation, it just a practice for python...
 
 Sample Code:
 -----------------------------------  
