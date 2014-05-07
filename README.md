@@ -33,5 +33,11 @@ Sample Code:
 
 ###Delete:
 ```python
->>>Users.delete(db,name='Ethan') # == delete from User where name = 'Ethan'
+>>>Users.delete(db,name='Ethan') # == delete from Users where name = 'Ethan'
+```
+
+
+###Update:
+```python
+>>>Users.update(db, name='Ethan').where(name='ethan') # == Update Users SET email = 'Ethan' WHERE name = 'ethan' 
 ```
