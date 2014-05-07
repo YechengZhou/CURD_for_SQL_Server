@@ -55,7 +55,6 @@ class myMSSQL:
         return a tuple list
         """
         cur = self._GetConnect()
-
         cur.execute(sql)
         resList = cur.fetchall()
         #close the connection after query
@@ -101,5 +100,4 @@ class myMSSQL:
             if isinstance(self.ExecQuery("select * from %s" % str(table_class.__name__)), types.ListType):
                 print "Info: Table %s may already exists" % str(table_class.__name__)
             else:
-                print "Info: Other unknown error" 
-        
+                print "Info: Other unknown error"

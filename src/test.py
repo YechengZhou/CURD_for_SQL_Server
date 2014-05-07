@@ -52,14 +52,8 @@ db.sync(Users)
 #Users.delete(db, name='ethan')
 
 print "x"*100
-Users.update(db, name='Ethan').where(name='ethan')
+#Users.update(db, name='ethan').where(name='Ethan')
 
+result = Users.select(db,'*').where(None)
+print "Result:", result
 print "x"*100
-"""
-u.id = 1
-u.name = "Ethan"
-
-
-u.save(db)
-
-User.delete(name='Etahn')"""

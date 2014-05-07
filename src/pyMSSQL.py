@@ -7,21 +7,6 @@ ORM for Microsoft SQL Server
 @author: Yecheng
 '''
 
-"""
-interface design, like other ORMs:
-
-class User(myModule):
-    id = IntegerField('id')
-    name = StringField('username')
-    email = StringField('email')
-    password = StringField('password')
-
-
-u = User(id=12345, name='Michael', email='test@orm.org', password='my-pwd')
-
-u.save()
-"""
-
 import types
 
 
@@ -171,10 +156,6 @@ class myModule(dict):
         except AttributeError:
             raise AttributeError(AttributeError.message + ',' + " you can not delete this time")
 
-        #print update_condition_list
-        #cls.update_sql = "Update %s Set %s Where %s" % (cls.__name__, )
-
-
         class update_TEMP():
             def __init__(self, db, table_name, set_condition_list):
                 self.db = db
@@ -186,27 +167,74 @@ class myModule(dict):
                     self.where_condition_list = cls.check_options(kwargs)
                 except AttributeError:
                     raise AttributeError(AttributeError.message + ',' + " you can not delete this time")
-                #return self.where_condition_list
                 self.db_operator()
 
             def sql_generator(self):
-                print self.set_condition_list
-                set_str = ",".join(self.set_condition_list)
-                where_str = ",".join(self.where_condition_list)
-                print set_str, where_str
-                self.update_sql = "Update {0:s} Set {1:s} Where {2:s}".format(self.table_name, set_str, where_str)
                 try:
                     set_str = ",".join(self.set_condition_list)
                     where_str = ",".join(self.where_condition_list)
                     self.update_sql = "Update {0:s} Set {1:s} Where {2:s}".format(self.table_name, set_str, where_str)
+                    print self.update_sql
+                    return self.update_sql
                 except:
                     raise AttributeError("Generating sql for update failed")
+
             update_sql = property(sql_generator)
 
             def db_operator(self):
-                print self.update_sql
                 db.ExecNoQuery(self.update_sql)
 
         temp_update = update_TEMP(db, cls.__name__, set_condition_list)
 
         return temp_update
+
+    @classmethod
+    def select(cls, db, *t):
+        cls.select_all = '*'in t and (len(t) == 1)
+        cls.select_columns = []
+        if cls.select_all:
+            cls.select_columns.append('*')
+        else:
+            for this_column in t:
+                if cls.__mapping__.has_key(this_column):
+                    cls.select_columns.append(this_column)
+                else:
+                    raise AttributeError("Do not have this column in table %s", cls.__name__)
+
+        class select_TEMP():
+            def __init__(self, db, table_name, select_columns):
+                self.db = db
+                self.table_name = table_name
+                self.select_columns = select_columns
+
+            def where(self, *t , **kwargs):
+                self.no_where = None in t and (len(t) == 1)# call like where(None)
+                try:
+                    self.where_condition_list = cls.check_options(kwargs)
+                except AttributeError:
+                    raise AttributeError(AttributeError.message + ',' + " you can not delete this time")
+                self.select_result = self.db_operator()
+                return self.select_result
+
+            def sql_generator(self):
+                try:
+                    select_str = ",".join(self.select_columns)
+                    if self.no_where:
+                        self.select_sql = "Select {0:s} from {1:s}".format(select_str, self.table_name)
+                    else:
+                        where_str = ",".join(self.where_condition_list)
+                        self.select_sql = "Select {0:s} from {1:s} Where {2:s}".format(select_str, self.table_name,  where_str)
+                    print self.select_sql
+                    return self.select_sql
+                except:
+                    raise AttributeError("Generating sql for update failed")
+
+            select_sql = property(sql_generator)
+
+            def db_operator(self):
+                return db.ExecQuery(self.select_sql)
+
+
+        select_temp = select_TEMP(db, cls.__name__, cls.select_columns)
+
+        return select_temp
