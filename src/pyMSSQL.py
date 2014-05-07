@@ -86,7 +86,7 @@ class myModule(dict):
             return self[key]
         except:
             if self.__mapping__.has_key(key) and isinstance(self.__mapping__[key],
-                                                            Field): ## find this arrt in __mapping__ and get default value
+                                                            Field):  # find this arrt in __mapping__ and get default value
                 if self.__mapping__[key].has_key('default'):
                     if self.__mapping__[key].default == 'NULL':
                         self.__setarr__(key, None)
@@ -140,18 +140,73 @@ class myModule(dict):
         db.ExecNoQuery(self.sql)
 
     @classmethod
-    def delete(cls, db, **kw):
+    def check_options(self, kw_dict):  # including check NULL values
         condition_list = []
-        for k, v in kw.iteritems():
-            print "mapping", cls.__mapping__
-            if k not in cls.__mapping__.iterkeys():
-                raise AttributeError("Do not have column %s in %s table, can't delete this item" % k, cls.__name__)
+        for k, v in kw_dict.iteritems():
+            if k not in self.__mapping__.iterkeys():
+                raise AttributeError("Do not have column %s in %s table" % k, self.__name__)
             else:
                 condition_list.append("%s = '%s'" % (k, v)) if v != None else condition_list.append(
                     "%s = %s" % (k, 'NULL'))
+        return condition_list
 
-        condition_str = ','.join(condition_list)
-        cls.delete_sql = "delete from %s where %s " % (cls.__name__, condition_str)
+    @classmethod
+    def delete(cls, db, **kw):
+        try:
+            delete_condition_list = cls.check_options(kw)
+        except AttributeError:
+            raise AttributeError(AttributeError.message + ',' + " you can not delete this time")
+
+        delete_condition_str = ','.join(delete_condition_list)
+        cls.delete_sql = "delete from %s where %s " % (cls.__name__, delete_condition_str)
         print cls.delete_sql
-        affected_items = db.ExecNoQuery(cls.delete_sql)
-        print "execution result: %s" % affected_items
+        delete_result = db.ExecNoQuery(cls.delete_sql)
+        print "execution result: %s" % delete_result
+
+    @classmethod
+    def update(cls, db, **kw):
+
+        try:
+            set_condition_list = cls.check_options(kw)
+        except AttributeError:
+            raise AttributeError(AttributeError.message + ',' + " you can not delete this time")
+
+        #print update_condition_list
+        #cls.update_sql = "Update %s Set %s Where %s" % (cls.__name__, )
+
+
+        class update_TEMP():
+            def __init__(self, db, table_name, set_condition_list):
+                self.db = db
+                self.table_name = table_name
+                self.set_condition_list = set_condition_list
+
+            def where(self, **kwargs):
+                try:
+                    self.where_condition_list = cls.check_options(kwargs)
+                except AttributeError:
+                    raise AttributeError(AttributeError.message + ',' + " you can not delete this time")
+                #return self.where_condition_list
+                self.db_operator()
+
+            def sql_generator(self):
+                print self.set_condition_list
+                set_str = ",".join(self.set_condition_list)
+                where_str = ",".join(self.where_condition_list)
+                print set_str, where_str
+                self.update_sql = "Update {0:s} Set {1:s} Where {2:s}".format(self.table_name, set_str, where_str)
+                try:
+                    set_str = ",".join(self.set_condition_list)
+                    where_str = ",".join(self.where_condition_list)
+                    self.update_sql = "Update {0:s} Set {1:s} Where {2:s}".format(self.table_name, set_str, where_str)
+                except:
+                    raise AttributeError("Generating sql for update failed")
+            update_sql = property(sql_generator)
+
+            def db_operator(self):
+                print self.update_sql
+                db.ExecNoQuery(self.update_sql)
+
+        temp_update = update_TEMP(db, cls.__name__, set_condition_list)
+
+        return temp_update

@@ -46,10 +46,13 @@ db.sync(Users)
 #u = Users( id=1, name='Yecheng', email='yecheng@123.com', password='password') ## new a record in User table
 
 #u.save(db) # save the change to db
-u = Users()
-print "x"*100
+#u = Users()
 
-Users.delete(db,name='Ethan')
+
+#Users.delete(db, name='ethan')
+
+print "x"*100
+Users.update(db, name='Ethan').where(name='ethan')
 
 print "x"*100
 """
